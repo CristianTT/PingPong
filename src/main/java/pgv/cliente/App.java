@@ -1,9 +1,8 @@
-package pgv;
+package pgv.cliente;
 
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
-import pgv.game.controller.GameController;
+import pgv.cliente.controller.GameController;
 
 public class App extends Application {
 	
@@ -13,26 +12,13 @@ public class App extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		controller = new GameController();
 
-		Scene scene = new Scene(controller.getView());
-
 		primaryStage.setTitle("PingPong");
-		//primaryStage.setFullScreen(true);
-		primaryStage.setScene(scene);
+		primaryStage.setScene(controller.getScene());
 		primaryStage.show();
-		
-		controller.setScene(scene);
 	}
 	
 	public static void main(String[] args) {
 		launch(args);
-	}
-	
-	public static String getRuta() {
-		return ruta;
-	}
-	
-	public static String getImagenExtension() {
-		return imagenExtension;
 	}
 	
 }

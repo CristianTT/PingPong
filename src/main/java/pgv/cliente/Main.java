@@ -1,4 +1,4 @@
-package pgv;
+package pgv.cliente;
 
 public class Main {
 
