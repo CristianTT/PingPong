@@ -22,6 +22,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import pgv.cliente.App;
 import pgv.models.Coordenada;
 import pgv.models.Coordenadas;
 import pgv.models.Puntuacion;
@@ -33,7 +34,7 @@ public class GameController implements Initializable {
 
 	private Scene scene;
 
-	private DataInputStream entrada = null;
+	private ObjectInputStream entrada = null;
 	private DataOutputStream salida = null;
 	private Socket clientSocket = null;
 	private String ip = "";
@@ -42,11 +43,11 @@ public class GameController implements Initializable {
 	private int puerto = 5555;
 	InetSocketAddress addr = null;
 
-	private static Rectangle jugadorRectangle, rivalRectangle;
-	private static Circle bolaCircle;
+	private Rectangle jugadorRectangle, rivalRectangle;
+	private Circle bolaCircle;
 	
 	@FXML
-	private static Label jugadorLabel, rivalLabel, puntuacionLabel;
+	private Label jugadorLabel, rivalLabel, puntuacionLabel;
 
 	public GameController() throws IOException {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/GameView.fxml"));
@@ -56,10 +57,11 @@ public class GameController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		System.out.println("PING PONG\n");
+		
 		scene = new Scene(root);
 
 		clientSocket = new Socket();
-
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Introduce la ip del servidor:");
 		ip = sc.nextLine();
@@ -86,17 +88,22 @@ public class GameController implements Initializable {
 		addr = new InetSocketAddress(ip, puerto);
 		try {
 			clientSocket.connect(addr);
-			entrada = new DataInputStream(clientSocket.getInputStream());
+			entrada = new ObjectInputStream(clientSocket.getInputStream());
 			salida = new DataOutputStream(clientSocket.getOutputStream());
 
 			jugadorLabel.setText(nickJugador);
 			salida.writeUTF(nickJugador);
-			nickRival = entrada.readUTF();
+			System.out.println("Esperando rival...");
+			nickRival = (String) entrada.readObject();
 			rivalLabel.setText(nickRival);
+			System.out.println("Jugarás contra " + nickRival);
 
-			EscucharCli escucha = new EscucharCli(clientSocket);
+			System.out.println("1");
+			EscucharCli escucha = new EscucharCli(entrada);
+			System.out.println("2");
 			escucha.start();
 
+			System.out.println("3");
 			scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
 				public void handle(KeyEvent e) {
 					String code = e.getCode().toString();
@@ -107,10 +114,12 @@ public class GameController implements Initializable {
 					}
 				}
 			});
-		} catch (IOException error) {
+			System.out.println("4");
+		} catch (IOException | ClassNotFoundException error) {
 			error.printStackTrace();
 		}
 		sc.close();
+		System.out.println("Iniciando el juego...");
 	}
 
 	public Scene getScene() {
@@ -123,24 +132,24 @@ public class GameController implements Initializable {
 		}
 	}
 	
-	public static void moverObjeto(Node node, double top, double left) {
+	public void moverObjeto(Node node, double top, double left) {
 		AnchorPane.setTopAnchor(node, top);
 		AnchorPane.setLeftAnchor(node, left);
 	}
 
-	public static Rectangle getJugadorRectangle() {
+	public Rectangle getJugadorRectangle() {
 		return jugadorRectangle;
 	}
 
-	public static Rectangle getRivalRectangle() {
+	public Rectangle getRivalRectangle() {
 		return rivalRectangle;
 	}
 
-	public static Circle getBolaCircle() {
+	public Circle getBolaCircle() {
 		return bolaCircle;
 	}
 
-	public static Label getPuntuacionLabel() {
+	public Label getPuntuacionLabel() {
 		return puntuacionLabel;
 	}
 }
@@ -149,8 +158,9 @@ class EscucharCli extends Thread {
 
 	ObjectInputStream entrada = null;
 
-	public EscucharCli(Socket clientSocket) throws IOException {
-		entrada = new ObjectInputStream(clientSocket.getInputStream());
+	public EscucharCli(ObjectInputStream entrada) throws IOException {
+		this.entrada = entrada;
+		//entrada = new ObjectInputStream(clientSocket.getInputStream());
 	}
 
 	@Override
@@ -158,12 +168,13 @@ class EscucharCli extends Thread {
 		try {
 			do {
 				Object obj = (Object) entrada.readUTF();
+				GameController gameController = App.getController();
 				if (obj instanceof Coordenadas) { // Posiciones de los objetos en el mapa
-					GameController.moverObjeto(GameController.getJugadorRectangle(), ((Coordenadas) obj).getJugador().getX(), ((Coordenadas) obj).getJugador().getY());
-					GameController.moverObjeto(GameController.getRivalRectangle(), ((Coordenadas) obj).getRival().getX(), ((Coordenadas) obj).getRival().getY());
-					GameController.moverObjeto(GameController.getBolaCircle(), ((Coordenadas) obj).getBola().getX(), ((Coordenadas) obj).getBola().getY());
+					gameController.moverObjeto(gameController.getJugadorRectangle(), ((Coordenadas) obj).getJugador().getX(), ((Coordenadas) obj).getJugador().getY());
+					gameController.moverObjeto(gameController.getRivalRectangle(), ((Coordenadas) obj).getRival().getX(), ((Coordenadas) obj).getRival().getY());
+					gameController.moverObjeto(gameController.getBolaCircle(), ((Coordenadas) obj).getBola().getX(), ((Coordenadas) obj).getBola().getY());
 				} else if (obj instanceof Puntuacion) { // Cuando se marca un punto
-					GameController.getPuntuacionLabel().setText(((Puntuacion) obj).getJugador() + " | " + ((Puntuacion) obj).getRival());
+					gameController.getPuntuacionLabel().setText(((Puntuacion) obj).getJugador() + " | " + ((Puntuacion) obj).getRival());
 				} else if (obj instanceof String) { // victoria / derrota 
 					System.out.println(obj);
 				}

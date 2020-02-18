@@ -1,7 +1,9 @@
 package pgv.servidor;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -22,8 +24,9 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 
+		System.out.println("SERVIDOR PING PONG");
 		serverSocket = new ServerSocket();
-		InetSocketAddress addr = new InetSocketAddress("127.0.0.1", puerto);
+		InetSocketAddress addr = new InetSocketAddress("192.168.0.15", puerto);
 		serverSocket.bind(addr);
 		
 		while (jugadores.size() < 2) {
@@ -87,11 +90,13 @@ class EscucharServ extends Thread {
 	
     private Socket socket;
     private DataInputStream dis;
+    private ObjectOutputStream oos;
     private Jugador jugador;
     
     public EscucharServ(Socket socket) throws IOException {
         this.socket = socket;
         dis = new DataInputStream(socket.getInputStream());
+        oos = new ObjectOutputStream(socket.getOutputStream());
 		String nick = dis.readUTF();
 		jugador = new Jugador(nick, new Coordenada(0.0, 0.0));
     }
@@ -107,6 +112,14 @@ class EscucharServ extends Thread {
     @Override
     public void run() {
     	System.out.println("Se ha conectado " + jugador.getNick());
+        try {
+			oos.writeUTF("Heyy");
+			//desconnectar();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+        
 		/*do {
 			Object obj = (Object) dis.readUTF();
 			if (obj instanceof Coordenadas) { // Posiciones de los objetos en el mapa
@@ -127,13 +140,5 @@ class EscucharServ extends Thread {
             dos.writeUTF("adios");
         }
         */
-        
-        
-        
-        try {
-			desconnectar();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
     }
 }

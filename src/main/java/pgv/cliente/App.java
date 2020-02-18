@@ -6,7 +6,7 @@ import pgv.cliente.controller.GameController;
 
 public class App extends Application {
 	
-	GameController controller;
+	private static GameController controller;
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -21,4 +21,7 @@ public class App extends Application {
 		launch(args);
 	}
 	
+	public static GameController getController() {
+		return controller;
+	}
 }
