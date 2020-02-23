@@ -64,7 +64,8 @@ public class GameController implements Initializable {
 		clientSocket = new Socket();
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Introduce la ip del servidor:");
-		ip = sc.nextLine();
+		//ip = sc.nextLine();
+		ip = "192.168.0.18";
 		puerto = 5555;
 		System.out.println("Introduce un nick:");
 		nickJugador = sc.nextLine();
@@ -98,12 +99,9 @@ public class GameController implements Initializable {
 			rivalLabel.setText(nickRival);
 			System.out.println("Jugarás contra " + nickRival);
 
-			System.out.println("1");
 			EscucharCli escucha = new EscucharCli(entrada);
-			System.out.println("2");
 			escucha.start();
 
-			System.out.println("3");
 			scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
 				public void handle(KeyEvent e) {
 					String code = e.getCode().toString();
@@ -114,7 +112,6 @@ public class GameController implements Initializable {
 					}
 				}
 			});
-			System.out.println("4");
 		} catch (IOException | ClassNotFoundException error) {
 			error.printStackTrace();
 		}
@@ -127,9 +124,7 @@ public class GameController implements Initializable {
 	}
 
 	public void pulsarTecla(String key) throws IOException {
-		while (continuar) {
-			salida.writeUTF(key);
-		}
+		salida.writeUTF(key);
 	}
 	
 	public void moverObjeto(Node node, double top, double left) {
@@ -160,16 +155,16 @@ class EscucharCli extends Thread {
 
 	public EscucharCli(ObjectInputStream entrada) throws IOException {
 		this.entrada = entrada;
-		//entrada = new ObjectInputStream(clientSocket.getInputStream());
 	}
 
 	@Override
 	public void run() {
 		try {
 			do {
-				Object obj = (Object) entrada.readUTF();
+				Object obj = (Object) entrada.readObject();
 				GameController gameController = App.getController();
 				if (obj instanceof Coordenadas) { // Posiciones de los objetos en el mapa
+					System.out.println(((Coordenadas) obj));
 					gameController.moverObjeto(gameController.getJugadorRectangle(), ((Coordenadas) obj).getJugador().getX(), ((Coordenadas) obj).getJugador().getY());
 					gameController.moverObjeto(gameController.getRivalRectangle(), ((Coordenadas) obj).getRival().getX(), ((Coordenadas) obj).getRival().getY());
 					gameController.moverObjeto(gameController.getBolaCircle(), ((Coordenadas) obj).getBola().getX(), ((Coordenadas) obj).getBola().getY());
@@ -177,9 +172,11 @@ class EscucharCli extends Thread {
 					gameController.getPuntuacionLabel().setText(((Puntuacion) obj).getJugador() + " | " + ((Puntuacion) obj).getRival());
 				} else if (obj instanceof String) { // victoria / derrota 
 					System.out.println(obj);
+				} else {
+					System.out.println("Hey");
 				}
 			} while (true);
-		} catch (IOException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}

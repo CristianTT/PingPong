@@ -4,12 +4,10 @@ public class Jugador {
 
 	private String nick;
 	private Coordenada coordenadas;
-	private String ip;
 
-	public Jugador(String nick, Coordenada coordenadas, String ip) {
+	public Jugador(String nick, Coordenada coordenadas) {
 		this.nick = nick;
 		this.coordenadas = coordenadas;
-		this.ip = ip;
 	}
 
 	public String getNick() {
@@ -26,14 +24,6 @@ public class Jugador {
 
 	public void setCoordenadas(Coordenada coordenadas) {
 		this.coordenadas = coordenadas;
-	}
-
-	public String getIp() {
-		return ip;
-	}
-
-	public void setIp(String ip) {
-		this.ip = ip;
 	}
 
 }

@@ -1,6 +1,8 @@
 package pgv.models;
 
-public class Coordenadas {
+import java.io.Serializable;
+
+public class Coordenadas implements Serializable {
 
 	private Coordenada jugador;
 	private Coordenada rival;
@@ -8,6 +10,7 @@ public class Coordenadas {
 
 	public Coordenadas(Coordenada jugador, Coordenada rival, Coordenada bola) {
 		this.jugador = jugador;
+		this.rival = rival;
 		this.bola = bola;
 	}
 
@@ -33,6 +36,11 @@ public class Coordenadas {
 
 	public void setBola(Coordenada bola) {
 		this.bola = bola;
+	}
+
+	@Override
+	public String toString() {
+		return "Coordenadas [jugador=" + jugador + ", rival=" + rival + ", bola=" + bola + "]";
 	}
 
 }
