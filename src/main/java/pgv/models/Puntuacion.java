@@ -1,29 +1,43 @@
 package pgv.models;
 
-public class Puntuacion {
+import java.io.Serializable;
 
-	int jugador;
-	int rival;
+public class Puntuacion implements Serializable {
 
-	public Puntuacion(int jugador, int rival) {
-		this.jugador = jugador;
-		this.rival = rival;
+	private static final long serialVersionUID = 2729879307460456158L;
+	int jugador0;
+	int jugador1;
+
+	public Puntuacion() {
+		this.jugador0 = 0;
+		this.jugador1 = 0;
 	}
 
-	public int getJugador() {
-		return jugador;
+	public Puntuacion(Puntuacion p) {
+		this.jugador0 = p.getJugador0();
+		this.jugador1 = p.getJugador1();
 	}
 
-	public void setJugador(int jugador) {
-		this.jugador = jugador;
+	public int getJugador0() {
+		return jugador0;
 	}
 
-	public int getRival() {
-		return rival;
+	public void puntoJugador0() {
+		this.jugador0 += 1;
 	}
 
-	public void setRival(int rival) {
-		this.rival = rival;
+	public int getJugador1() {
+		return jugador1;
 	}
+
+	public void puntoJugador1() {
+		this.jugador1 += 1;
+	}
+
+	@Override
+	public String toString() {
+		return jugador0 + " | " + jugador1;
+	}
+	
 
 }
