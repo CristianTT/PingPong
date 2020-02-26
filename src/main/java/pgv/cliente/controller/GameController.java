@@ -66,12 +66,12 @@ public class GameController implements Initializable {
 		clientSocket = new Socket();
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Introduce la ip del servidor:");
-		//ip = sc.nextLine();
-		ip = "192.168.0.24";
+		ip = sc.nextLine();
+		//ip = "192.168.0.24";
 		puerto = 5555;
 		System.out.println("Introduce un nick:");
-		//nickJugador = sc.nextLine();
-		nickJugador = "Jugador" + (int) Math.floor(Math.random() * 99);
+		nickJugador = sc.nextLine();
+		//nickJugador = "Jugador" + (int) Math.floor(Math.random() * 99);
 
 		jugador0Rectangle = new Rectangle();
 		jugador0Rectangle.setFill(Color.rgb(0, 162, 232));
